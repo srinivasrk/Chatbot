@@ -1,3 +1,13 @@
+---
+title: Portfolio profile chatbot
+emoji: 💬
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Portfolio profile chatbot
 
 A small **Gradio** chat UI served behind **FastAPI** (Uvicorn), backed by **Google Gemini**. Visitors ask questions about your professional background; answers are grounded in a **profile** you supply (PDF, Markdown, or plain text) and restricted by a **scope gate** plus **rate limiting** so the app is not a general-purpose chatbot or an open token sink.
@@ -53,6 +63,44 @@ The assistant is instructed to reply in **first person** (as you), with enough d
    ```
 
 6. Open **http://127.0.0.1:7860** in a browser.
+
+## Hugging Face Spaces
+
+This app is served by **Uvicorn + FastAPI** with Gradio mounted, so use a **Docker** Space (not the one-click **Gradio** SDK template, which expects a bare `demo` object).
+
+When you [create a Space](https://huggingface.co/new-space):
+
+| Setting | Choose |
+| -------- | ------ |
+| **SDK** | **Docker** |
+| **Docker template** | **Blank** |
+| **Hardware** | **CPU Basic** (free) is enough for typical portfolio traffic |
+| **Visibility** | **Public** if you want a shareable iframe URL without login |
+
+Then connect your Git repo (or push this project). The repo includes a [`Dockerfile`](Dockerfile) that runs Uvicorn on port **7860**.
+
+Add secrets in the Space **Settings → Variables and secrets** (at minimum):
+
+- `GOOGLE_API_KEY` — your Gemini API key
+
+Optional variables match [.env.example](.env.example): e.g. `GEMINI_MODEL`, `FRAME_ANCESTORS`, `PROFILE_PATH`, or `PROFILE_CONTEXT`.
+
+Include **`Profile.pdf`** (or another profile file) in the repository **or** inject profile text via secrets / variables if your host supports multiline values. Rebuild the Space after changing files or secrets.
+
+If the Space UI asks for **App port**, use **7860** (see `EXPOSE` in the Dockerfile).
+
+**There is no “import from GitHub” button inside every Space.** The Space is its **own Git repo** on Hugging Face. Typical workflow: keep developing on GitHub, then push the same commit history to Hugging Face (second remote), or use [GitHub Actions to sync](https://huggingface.co/docs/hub/spaces-github-actions).
+
+From your laptop (once per machine), with this repo checked out and `origin` pointing at GitHub:
+
+```bash
+# Use your HF Space URL (Settings → show git clone URL if needed)
+git remote add hf https://huggingface.co/spaces/YOUR_HF_USERNAME/YOUR_SPACE_NAME
+
+git push hf main
+```
+
+Use your **Hugging Face access token** as the password when Git prompts you. After the push, the Space rebuilds from the `Dockerfile`. Add **Secrets** (`GOOGLE_API_KEY`) under the Space **Settings** tab.
 
 ## Configuration
 
