@@ -190,27 +190,36 @@ Model names and billing: [Gemini models](https://ai.google.dev/gemini-api/docs/m
 
 ## Embedding in your portfolio (iframe)
 
-The app sends **`Content-Security-Policy: frame-ancestors …`** and removes **`X-Frame-Options`** when present so your portfolio can embed it. Your `FRAME_ANCESTORS` list is merged with **`https://huggingface.co`** and **`https://www.huggingface.co`** by default so the Space still loads on [the Hugging Face website](https://huggingface.co/spaces); without that, the hub’s own iframe is blocked by your CSP.
+The app sends **`Content-Security-Policy: frame-ancestors …`** and removes **`X-Frame-Options`** from **your** Space responses. Your `FRAME_ANCESTORS` list is merged with **`https://huggingface.co`** / **`https://www.huggingface.co`** so the Space **App** tab on the hub still works.
 
-1. Serve the app over **HTTPS** (Hugging Face Spaces does this automatically).
-2. Set **`FRAME_ANCESTORS`** to your real origins, e.g.
+### Hugging Face: use the `*.hf.space` URL in iframes (important)
+
+| URL | Use case |
+| --- | -------- |
+| `https://huggingface.co/spaces/USER/SPACE` | **Opening in a new tab** / sharing a link. Hugging Face’s **HTML shell** often sets **`X-Frame-Options: deny`** — **do not** use this as your iframe `src` on another site. |
+| `https://USER-SPACE.hf.space/` | **Iframe `src` on your portfolio.** This hits your container directly; your app’s headers allow embedding from origins you listed in `FRAME_ANCESTORS`. |
+
+On your Space page, open the **“…”** / **Embed** menu if needed; the **`hf.space`** address is the one to embed.
+
+1. Set **`FRAME_ANCESTORS`** (Space variables) to your origins, e.g.
 
    ```env
-   FRAME_ANCESTORS=https://yourdomain.com,https://www.yourdomain.com
+   FRAME_ANCESTORS=http://localhost:3000,http://127.0.0.1:5173,https://srini.fyi
    ```
 
-3. Example embed:
+2. Example embed (**replace** with your real `*.hf.space` URL):
 
    ```html
    <iframe
-     src="https://your-chat-host.example/"
+     src="https://srinirk23-srini-chatbot.hf.space/"
      title="Profile assistant"
      loading="lazy"
-     style="width:100%;min-height:640px;border:0;border-radius:8px"
+     referrerpolicy="strict-origin-when-cross-origin"
+     style="width:100%;max-width:900px;height:720px;border:0;border-radius:12px;display:block;margin:0 auto"
    ></iframe>
    ```
 
-If the iframe is blank, check the browser **Console** for CSP or mixed-content errors.
+If the iframe is blank, check the console for CSP errors and confirm `src` is **`*.hf.space`**, not `huggingface.co/spaces/...`.
 
 ---
 

@@ -17,6 +17,154 @@ from limits.ratelimit import SlidingWindowLimiter
 settings = Settings.load()
 PROFILE_TEXT = load_profile_text(settings)
 
+# Split by `prefers-color-scheme` so the iframe follows system light/dark. Gradio maps the same
+# preference to its `*_dark` theme tokens; custom bubble/input rules apply only in light mode.
+_EMBED_CSS = """
+.gradio-container {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 0.6rem 0.85rem 1rem !important;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+#portfolio-chat-intro {
+    margin-bottom: 0.45rem;
+}
+#portfolio-chat-intro h3 {
+    font-weight: 650;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.35rem 0;
+    line-height: 1.25;
+    font-size: 1.15rem;
+}
+#portfolio-chat-intro p {
+    margin: 0;
+    line-height: 1.55;
+    font-size: 1rem;
+}
+.gradio-container .message-wrap .bot .prose,
+.gradio-container .message-wrap .bot .prose.chatbot.md,
+.gradio-container .message-wrap .user .prose,
+.gradio-container .message-wrap .user .prose.chatbot.md {
+    opacity: 1 !important;
+}
+
+@media (prefers-color-scheme: light) {
+    .gradio-container .bubble-wrap {
+        background: rgba(255, 255, 255, 0.55) !important;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 14px !important;
+        border: 1px solid rgba(15, 118, 110, 0.14) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    }
+    #portfolio-chat-intro h3 {
+        color: #0f172a;
+    }
+    #portfolio-chat-intro p {
+        color: #334155;
+    }
+    .gradio-container .message-wrap .bot {
+        background-color: #ffffff !important;
+        border-color: rgba(15, 23, 42, 0.12) !important;
+        box-shadow: none !important;
+        color: #0f172a !important;
+    }
+    .gradio-container .message-wrap .bot .prose,
+    .gradio-container .message-wrap .bot .prose.chatbot.md {
+        color: #0f172a !important;
+    }
+    .gradio-container .message-wrap .bot .prose a {
+        color: #0f766e !important;
+    }
+    .gradio-container .message-wrap .bot .prose code {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+    .gradio-container .message-wrap .bot .prose pre {
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+    }
+    .gradio-container .message-wrap .user {
+        background: linear-gradient(180deg, #d1fae5 0%, #a7f3d0 100%) !important;
+        box-shadow: none !important;
+        border-color: rgba(13, 148, 136, 0.35) !important;
+        color: #0f172a !important;
+    }
+    .gradio-container .message-wrap .user .prose,
+    .gradio-container .message-wrap .user .prose.chatbot.md {
+        color: #0f172a !important;
+    }
+    .gradio-container .bubble-wrap .placeholder,
+    .gradio-container [data-testid="chatbot"] .placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    .gradio-container textarea,
+    .gradio-container input[type="text"] {
+        background: #ffffff !important;
+        color: #0f172a !important;
+    }
+    .gradio-container textarea::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .gradio-container .bubble-wrap {
+        background: rgba(15, 23, 42, 0.45) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 14px !important;
+        border: 1px solid rgba(94, 234, 212, 0.14) !important;
+    }
+    #portfolio-chat-intro h3 {
+        color: #f1f5f9;
+    }
+    #portfolio-chat-intro p {
+        color: #cbd5e1;
+    }
+    .gradio-container .bubble-wrap .placeholder,
+    .gradio-container [data-testid="chatbot"] .placeholder {
+        color: #94a3b8 !important;
+        opacity: 1 !important;
+    }
+}
+"""
+
+
+def _portfolio_theme() -> gr.themes.Soft:
+    _page_light = "linear-gradient(165deg, #f4f6fa 0%, #eef1f8 48%, #ebf5f4 100%)"
+    _page_dark = "linear-gradient(165deg, #0f172a 0%, #1e293b 52%, #134e4a 100%)"
+    _block_light = "rgba(255, 255, 255, 0.78)"
+    _block_dark = "rgba(30, 41, 59, 0.72)"
+    _teal_border = "rgba(15, 118, 110, 0.11)"
+    _teal_border_dark = "rgba(45, 212, 191, 0.2)"
+    _field_light = "rgba(15, 23, 42, 0.1)"
+    _field_dark = "rgba(148, 163, 184, 0.28)"
+    return gr.themes.Soft(primary_hue="teal", neutral_hue="slate").set(
+        body_background_fill=_page_light,
+        body_background_fill_dark=_page_dark,
+        block_background_fill=_block_light,
+        block_background_fill_dark=_block_dark,
+        block_border_color=_teal_border,
+        block_border_color_dark=_teal_border_dark,
+        border_color_primary=_field_light,
+        border_color_primary_dark=_field_dark,
+        border_color_accent="rgba(13, 148, 136, 0.35)",
+        border_color_accent_dark="rgba(45, 212, 191, 0.4)",
+        color_accent_soft="#ccfbf1",
+        color_accent_soft_dark="rgba(45, 212, 191, 0.18)",
+        block_border_width="1px",
+        input_background_fill="#ffffff",
+        input_background_fill_dark="#1e293b",
+        input_border_color=_field_light,
+        input_border_color_dark=_field_dark,
+        input_placeholder_color="#64748b",
+        input_placeholder_color_dark="#94a3b8",
+    )
+
+
 _limiter = SlidingWindowLimiter(
     max_events=settings.rate_limit_max_messages,
     window_seconds=settings.rate_limit_window_seconds,
@@ -199,29 +347,35 @@ def chat_response(
 
 def _build_demo() -> gr.Blocks:
     intro = (
-        "## Ask about my professional background\n"
-        "Questions should stay within what is in my profile materials."
+        "### Hi — thanks for stopping by\n\n"
+        "Ask me about my work, projects, or background. "
+        "I stick to what’s in my profile here so answers stay accurate and grounded in what I’ve shared."
     )
     if "No profile content loaded" in PROFILE_TEXT:
         intro = (
-            "## Profile assistant\n"
+            "### Profile assistant\n\n"
             "_Add content via `profile.md` or the `PROFILE_CONTEXT` environment variable._"
         )
 
-    with gr.Blocks(title="Profile assistant") as demo:
-        gr.Markdown(intro)
+    with gr.Blocks(title="Portfolio chat") as demo:
+        gr.Markdown(intro, elem_id="portfolio-chat-intro")
         chatbot = gr.Chatbot(
-            label="Chat",
             height=420,
+            show_label=False,
+            placeholder=(
+                "_Nothing here yet — type a question below and I’ll reply "
+                "from my profile._"
+            ),
         )
         msg = gr.Textbox(
-            label="Your question",
-            placeholder="e.g. What is your most recent role?",
+            label="Message",
+            placeholder="e.g. What are you focused on lately?",
             lines=2,
+            show_label=False,
         )
         with gr.Row():
             submit = gr.Button("Send", variant="primary")
-            clear = gr.Button("Clear conversation")
+            clear = gr.Button("Clear chat")
 
         msg.submit(chat_response, [msg, chatbot], [chatbot, msg])
         submit.click(chat_response, [msg, chatbot], [chatbot, msg])
@@ -261,8 +415,9 @@ def create_app() -> FastAPI:
         fastapi_app,
         demo,
         path="/",
-        theme=gr.themes.Soft(),
-        css=".gradio-container { max-width: 720px !important; margin: 0 auto; }",
+        theme=_portfolio_theme(),
+        css=_EMBED_CSS,
+        footer_links=[],
     )
 
 
