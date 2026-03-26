@@ -230,6 +230,18 @@ def _build_demo() -> gr.Blocks:
     return demo
 
 
+# HF embeds *.hf.space inside huggingface.co; those parents must be allowed or the Space "App" tab breaks.
+_HF_PARENT_ORIGINS = "https://huggingface.co https://www.huggingface.co"
+
+
+def _frame_ancestors_header_value() -> str:
+    """FRAME_ANCESTORS from env plus Hugging Face hub (unless user set *)."""
+    fa = settings.frame_ancestors.strip()
+    if fa == "*":
+        return "*"
+    return f"{fa} {_HF_PARENT_ORIGINS}"
+
+
 def create_app() -> FastAPI:
     fastapi_app = FastAPI(title="Portfolio profile assistant")
 
@@ -237,7 +249,7 @@ def create_app() -> FastAPI:
     async def iframe_framing_headers(request, call_next):  # type: ignore[no-untyped-def]
         response = await call_next(request)
         response.headers["Content-Security-Policy"] = (
-            f"frame-ancestors {settings.frame_ancestors}"
+            f"frame-ancestors {_frame_ancestors_header_value()}"
         )
         remove = [k for k in response.headers if k.lower() == "x-frame-options"]
         for k in remove:
