@@ -274,15 +274,20 @@ def _append_turn(history: list[dict[str, Any]], user_text: str, assistant_text: 
     history.append({"role": "assistant", "content": assistant_text})
 
 
+def _chatbot_panel_update(history: list[Any]) -> gr.Chatbot:
+    """Hide the transcript until there are messages; expand when the first reply is in."""
+    return gr.update(value=history, visible=bool(history))
+
+
 def chat_response(
     message: str,
     history: list[Any],
     request: gr.Request,
-) -> tuple[list[Any], str]:
+) -> tuple[gr.Chatbot, str]:
     history = list(history or [])
 
     if not (message or "").strip():
-        return history, message or ""
+        return _chatbot_panel_update(history), message or ""
 
     user_msg = message.strip()
     if len(user_msg) > settings.max_message_chars:
@@ -291,7 +296,7 @@ def chat_response(
             user_msg,
             f"Message too long (max {settings.max_message_chars} characters).",
         )
-        return history, ""
+        return _chatbot_panel_update(history), ""
 
     if not _has_api_key():
         _append_turn(
@@ -299,13 +304,13 @@ def chat_response(
             user_msg,
             "Server misconfiguration: set GOOGLE_API_KEY (or GEMINI_API_KEY) for Gemini.",
         )
-        return history, ""
+        return _chatbot_panel_update(history), ""
 
     key = _rate_limit_key(request)
     ok, err = _limiter.check(key)
     if not ok:
         _append_turn(history, user_msg, err)
-        return history, ""
+        return _chatbot_panel_update(history), ""
 
     client = _get_client()
     try:
@@ -317,7 +322,7 @@ def chat_response(
         )
         if not allowed:
             _append_turn(history, user_msg, refusal)
-            return history, ""
+            return _chatbot_panel_update(history), ""
 
         prior = _history_to_contents(history)
         prior.append(
@@ -342,7 +347,7 @@ def chat_response(
     except Exception as e:  # noqa: BLE001 — surface useful errors in the chat UI
         _append_turn(history, user_msg, f"Something went wrong: {e!s}")
 
-    return history, ""
+    return _chatbot_panel_update(history), ""
 
 
 def _build_demo() -> gr.Blocks:
@@ -362,6 +367,7 @@ def _build_demo() -> gr.Blocks:
         chatbot = gr.Chatbot(
             height=420,
             show_label=False,
+            visible=False,
             placeholder=(
                 "_Nothing here yet — type a question below and I’ll reply "
                 "from my profile._"
@@ -379,7 +385,10 @@ def _build_demo() -> gr.Blocks:
 
         msg.submit(chat_response, [msg, chatbot], [chatbot, msg])
         submit.click(chat_response, [msg, chatbot], [chatbot, msg])
-        clear.click(lambda: ([], ""), outputs=[chatbot, msg])
+        clear.click(
+            lambda: (gr.update(value=[], visible=False), ""),
+            outputs=[chatbot, msg],
+        )
 
     return demo
 
