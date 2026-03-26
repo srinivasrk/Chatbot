@@ -20,11 +20,29 @@ PROFILE_TEXT = load_profile_text(settings)
 # Split by `prefers-color-scheme` so the iframe follows system light/dark. Gradio maps the same
 # preference to its `*_dark` theme tokens; custom bubble/input rules apply only in light mode.
 _EMBED_CSS = """
+/* Embedded iframes: avoid nested scrollbars (outer page + chat inner). */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+/* Gradio mounts into <gradio-app> (no #root in shipped HTML). */
+gradio-app {
+    height: 100%;
+    min-height: 0;
+}
 .gradio-container {
     max-width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    box-sizing: border-box;
     margin: 0 auto !important;
     padding: 0.6rem 0.85rem 1rem !important;
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+/* Let the chatbot flex child shrink so overflow scroll stays inside the transcript, not the document. */
+#portfolio-chat-transcript {
+    min-height: 0 !important;
 }
 #portfolio-chat-intro {
     margin-bottom: 0.45rem;
@@ -362,10 +380,16 @@ def _build_demo() -> gr.Blocks:
             "_Add content via `profile.md` or the `PROFILE_CONTEXT` environment variable._"
         )
 
-    with gr.Blocks(title="Portfolio chat") as demo:
+    with gr.Blocks(
+        title="Portfolio chat",
+        fill_height=True,
+        fill_width=True,
+    ) as demo:
         gr.Markdown(intro, elem_id="portfolio-chat-intro")
         chatbot = gr.Chatbot(
-            height=420,
+            elem_id="portfolio-chat-transcript",
+            height="100%",
+            scale=1,
             show_label=False,
             visible=False,
             placeholder=(
