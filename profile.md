@@ -71,13 +71,6 @@ Animated road congestion on a Mapbox map: centerlines and a full time series per
 **Tags:** PostGIS, TimescaleDB, Mapbox, Next.js, FastAPI
 **Repo:** https://github.com/srinivasrk/postgis-mapbox
 
-## Travel Highlights
-
-- Kyoto, Japan — Temples & quiet streets
-- Reykjavik, Iceland — Northern lights chase
-- Lisbon, Portugal — Tiles & tram rides
-- Vancouver, Canada — Coast & mountains
-
 ## Reading List
 
 ### 2026
