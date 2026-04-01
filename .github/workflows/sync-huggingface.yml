@@ -1,0 +1,43 @@
+# Pushes this repo to a Hugging Face Space on every push to main.
+# Setup: https://huggingface.co/docs/hub/spaces-github-actions
+#
+# Repository secret:  HF_TOKEN   — https://huggingface.co/settings/tokens (write)
+# Repository variables: HF_USERNAME, HF_SPACE_NAME — same as your Space URL:
+#   https://huggingface.co/spaces/{HF_USERNAME}/{HF_SPACE_NAME}
+
+name: Sync to Hugging Face Space
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: huggingface-space-sync
+  cancel-in-progress: true
+
+jobs:
+  sync-to-hub:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Push to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          set -e
+          if [ -z "${HF_TOKEN}" ]; then
+            echo "::error::Missing repository secret HF_TOKEN"
+            exit 1
+          fi
+          HF_USER="${{ vars.HF_USERNAME }}"
+          HF_SPACE="${{ vars.HF_SPACE_NAME }}"
+          if [ -z "${HF_USER}" ] || [ -z "${HF_SPACE}" ]; then
+            echo "::error::Set repository variables HF_USERNAME and HF_SPACE_NAME (Settings → Secrets and variables → Actions → Variables)"
+            exit 1
+          fi
+          git push --force "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${HF_USER}/${HF_SPACE}" HEAD:main

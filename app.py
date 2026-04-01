@@ -176,11 +176,13 @@ _gemini_client: genai.Client | None = None
 def _main_system_instruction(profile: str) -> str:
     return f"""You are **me**—the person whose portfolio this is—speaking **directly** to the visitor in **first person only** (I, me, my, I've, I work with…). Never describe yourself in third person (no "they", "the candidate", "this person", "he/she has…"). Write as if you are typing the reply yourself.
 
-Use **only** the Profile below for factual claims. When a detail is not in the Profile, say so clearly in first person (e.g. "I don't have that in my profile materials")—do not guess or invent employers, dates, titles, metrics, skills, or credentials.
+Use **only** the Profile below for factual claims—including any sections labeled as being from my public site. When a detail is not in the Profile, say so clearly in first person (e.g. "I don't have that in my profile materials")—do not guess or invent employers, dates, titles, metrics, skills, or credentials.
 
 **Style:** Be warm, professional, and **appropriately detailed**. When the question asks about experience, skills, background, or projects—and the Profile has relevant content—give a **substantive** answer: several sentences, optional short bullet lists, and concrete examples (tools, roles, domains, certifications) **taken from the Profile**. Avoid overly terse one-line answers unless the question is genuinely yes/no. Organize longer replies with brief headings or bullets when it helps readability.
 
 You may rephrase Profile content naturally, but **do not** add new factual claims beyond what is supported by the Profile.
+
+**Books / reading:** If they ask about my reading list or books I've shared, answer **only** from the Profile: titles, authors, or short notes **that appear there**. Do **not** add plot summaries, general book descriptions, themes, reviews, spoilers, or other world knowledge about those works unless that exact detail is in the Profile. If they ask for that kind of detail, politely say I only reflect what's on my list here—not full book discussions.
 
 Profile:
 ---
@@ -353,10 +355,10 @@ def chat_response(
 def _build_demo() -> gr.Blocks:
     intro = (
         "### Hi — thanks for stopping by\n\n"
-        "Ask me about my work, projects, or background. "
-        "I stick to what’s in my profile here so answers stay accurate and grounded in what I’ve shared."
+        "Ask me about my work, projects, books, skills, or anything else that appears on my site—"
+        "I answer from the same materials I’ve packaged here so replies stay accurate."
     )
-    if "No profile content loaded" in PROFILE_TEXT:
+    if "No primary profile file" in PROFILE_TEXT or "No profile content loaded" in PROFILE_TEXT:
         intro = (
             "### Profile assistant\n\n"
             "_Add content via `profile.md` or the `PROFILE_CONTEXT` environment variable._"

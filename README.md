@@ -158,10 +158,27 @@ Rebuild after changing profile or secrets.
 
 ### Keeping GitHub and Hugging Face in sync
 
-There is **no** universal “Import from GitHub” button inside the Space UI. Common patterns:
+There is **no** universal “Import from GitHub” button Space-side; mirror from GitHub with one of these:
 
-- Add `hf` as a **second remote** and push to both `origin` and `hf`, or  
-- Use [GitHub Actions → Hugging Face](https://huggingface.co/docs/hub/spaces-github-actions) to deploy on every push to `main`.
+- Add `hf` as a **second remote** and push to both `origin` and `hf` (see [step 3](#3-push-this-code-to-the-space) above), or  
+- Use **GitHub Actions** in this repo (details below), following the same [Hugging Face ↔ Actions](https://huggingface.co/docs/hub/spaces-github-actions) pattern.
+
+**Automated sync (this repository)**
+
+| File | What it does |
+| ---- | ------------ |
+| [`.github/workflows/sync-huggingface.yml`](.github/workflows/sync-huggingface.yml) | On every push to `main` (and on manual **Actions → Sync to Hugging Face Space**), force-pushes the repo to your Space’s `main` with Git LFS enabled. |
+| [`.github/workflows/huggingface-file-size.yml`](.github/workflows/huggingface-file-size.yml) | On PRs into `main`, warns if any file exceeds **10 MB** (Spaces limit for non–Git LFS blobs). |
+
+In your GitHub repo: **Settings → Secrets and variables → Actions**
+
+| Kind | Name | Value |
+| ---- | ---- | ----- |
+| Secret | `HF_TOKEN` | [Hugging Face access token](https://huggingface.co/settings/tokens) with **write** access. |
+| Variable | `HF_USERNAME` | Hub user or org that owns the Space (same as `YOUR_USERNAME` in `spaces/YOUR_USERNAME/YOUR_SPACE_NAME`). |
+| Variable | `HF_SPACE_NAME` | Space slug (same as `YOUR_SPACE_NAME` in that URL). |
+
+Create the Space on Hugging Face first; the workflow only pushes Git history and does not create the Space.
 
 ---
 

@@ -12,6 +12,9 @@ load_dotenv()
 
 ROOT = Path(__file__).resolve().parent
 
+# Auto-synced from the portfolio repo when present; merged in `load_profile_text`.
+AUTO_PROFILE_MD = ROOT / "profile.md"
+
 
 def _int(name: str, default: int) -> int:
     raw = os.environ.get(name)
@@ -40,6 +43,7 @@ class Settings:
     scope_gate_model: str
     profile_context: str
     profile_path: Path
+    extra_profile_paths: tuple[Path, ...]
     max_message_chars: int
     max_output_tokens: int
     chat_temperature: float
@@ -59,6 +63,12 @@ class Settings:
         ).strip()
         profile_env = (os.environ.get("PROFILE_CONTEXT") or "").strip()
         rel_profile = (os.environ.get("PROFILE_PATH") or "Profile.pdf").strip()
+        extra_raw = (os.environ.get("EXTRA_PROFILE_PATHS") or "").strip()
+        extra_paths: list[Path] = []
+        for part in extra_raw.split(","):
+            p = part.strip()
+            if p:
+                extra_paths.append((ROOT / p).resolve())
         frame_raw = (os.environ.get("FRAME_ANCESTORS") or "*").strip()
 
         return cls(
@@ -69,6 +79,7 @@ class Settings:
             ).strip(),
             profile_context=profile_env,
             profile_path=(ROOT / rel_profile).resolve(),
+            extra_profile_paths=tuple(extra_paths),
             max_message_chars=_int("MAX_MESSAGE_CHARS", 2000),
             max_output_tokens=_int("MAX_OUTPUT_TOKENS", 4096),
             chat_temperature=_float("CHAT_TEMPERATURE", 0.65),
@@ -94,16 +105,8 @@ def _extract_pdf_text(path: Path) -> str:
         doc.close()
 
 
-def load_profile_text(settings: Settings) -> str:
-    """PROFILE_CONTEXT env wins, else PROFILE_PATH file (.pdf, .md, .txt)."""
-    if settings.profile_context:
-        return settings.profile_context
-    path = settings.profile_path
-    if not path.is_file():
-        return (
-            "(No profile content loaded. Set PROFILE_CONTEXT or place a file at "
-            f"{path.name}.)"
-        )
+def _read_profile_file(path: Path) -> str:
+    """Read one .pdf / .md / .txt profile fragment; path must exist."""
     suffix = path.suffix.lower()
     try:
         if suffix == ".pdf":
@@ -117,3 +120,44 @@ def load_profile_text(settings: Settings) -> str:
         return path.read_text(encoding="utf-8")
     except Exception as e:  # noqa: BLE001
         return f"(Error reading profile file {path.name}: {e})"
+
+
+def load_profile_text(settings: Settings) -> str:
+    """Primary: PROFILE_CONTEXT else PROFILE_PATH; then EXTRA_PROFILE_PATHS; then profile.md if present."""
+    parts: list[str] = []
+    seen_resolved: set[Path] = set()
+
+    if settings.profile_context:
+        parts.append(settings.profile_context)
+    else:
+        path = settings.profile_path
+        if not path.is_file():
+            parts.append(
+                "(No primary profile file. Set PROFILE_CONTEXT or place a file at "
+                f"{path.name}.)"
+            )
+        else:
+            parts.append(_read_profile_file(path))
+            seen_resolved.add(path.resolve())
+
+    for extra in settings.extra_profile_paths:
+        if not extra.is_file():
+            continue
+        r = extra.resolve()
+        if r in seen_resolved:
+            continue
+        seen_resolved.add(r)
+        parts.append(
+            f"\n\n---\n\n### More from my public site ({extra.name})\n\n{_read_profile_file(extra)}"
+        )
+
+    auto_md = AUTO_PROFILE_MD
+    if auto_md.is_file():
+        md_resolved = auto_md.resolve()
+        if md_resolved not in seen_resolved:
+            parts.append(
+                "\n\n---\n\n### Live portfolio export (profile.md)\n\n"
+                f"{_read_profile_file(auto_md)}"
+            )
+
+    return "".join(parts).strip()

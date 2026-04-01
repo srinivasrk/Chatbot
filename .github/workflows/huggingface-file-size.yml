@@ -1,0 +1,18 @@
+# Spaces rejects regular Git blobs over ~10 MB; warn on PRs before merge.
+# https://huggingface.co/docs/hub/spaces-github-actions
+
+name: Hugging Face file size check
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  check-large-files:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check files over 10 MB
+        uses: ActionsDesk/lfs-warning@v2.0
+        with:
+          filesizelimit: 10485760 # 10 MiB (Hugging Face Spaces limit for non-LFS)
