@@ -47,6 +47,7 @@ I'm an AI-native engineer with hands-on experience building applications using a
 ### Portfolio profile chatbot
 
 **Year:** 2025
+**Domain:** AI
 
 A Gradio chat UI on FastAPI that answers in my voice using Google Gemini, grounded in my profile PDF. A scope gate keeps questions on-topic before the main model runs; rate limits help control API cost. Packaged with Docker and embeddable on Hugging Face Spaces.
 
@@ -56,15 +57,18 @@ A Gradio chat UI on FastAPI that answers in my voice using Google Gemini, ground
 ### Stock analyst — CrewAI
 
 **Year:** 2025
+**Domain:** AI
 
 Agentic sector research with CrewAI: a multi-agent pipeline uses web search (Serper) and Gemini to produce structured research output. FastAPI backend with async jobs and WebSockets, plus a TypeScript SPA; Auth0 for sign-in.
 
 **Tags:** CrewAI, FastAPI, TypeScript, Gemini, Auth0
+**Demo:** https://stocks.srini.fyi
 **Repo:** https://github.com/srinivasrk/Market-Researcher---Crew-AI
 
 ### Seattle traffic map — PostGIS & Mapbox
 
 **Year:** 2023
+**Domain:** Maps & GIS
 
 Animated road congestion on a Mapbox map: centerlines and a full time series per road live in PostgreSQL (PostGIS + TimescaleDB). The browser loads dual vector tile layers (static roads + traffic overlay with embedded frame properties c0, c1, …) and scrubs time without changing tile URLs. FastAPI serves MVT; Next.js 15 client.
 
