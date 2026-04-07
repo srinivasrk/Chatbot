@@ -165,6 +165,11 @@ def _portfolio_theme() -> gr.themes.Soft:
     )
 
 
+# Maximum number of user/assistant *exchanges* forwarded to Gemini.
+# Each exchange = 2 messages (user + assistant), so 15 exchanges = 30 messages.
+# Keeps prompts well within token limits on long conversations.
+_MAX_HISTORY_EXCHANGES = 15
+
 _limiter = SlidingWindowLimiter(
     max_events=settings.rate_limit_max_messages,
     window_seconds=settings.rate_limit_window_seconds,
@@ -285,11 +290,11 @@ def chat_response(
     message: str,
     history: list[Any],
     request: gr.Request,
-) -> tuple[gr.Chatbot, str]:
+) -> tuple[gr.Chatbot, str, list]:
     history = list(history or [])
 
     if not (message or "").strip():
-        return _chatbot_panel_update(history), message or ""
+        return _chatbot_panel_update(history), message or "", history
 
     user_msg = message.strip()
     if len(user_msg) > settings.max_message_chars:
@@ -298,7 +303,7 @@ def chat_response(
             user_msg,
             f"Message too long (max {settings.max_message_chars} characters).",
         )
-        return _chatbot_panel_update(history), ""
+        return _chatbot_panel_update(history), "", history
 
     if not _has_api_key():
         _append_turn(
@@ -306,13 +311,13 @@ def chat_response(
             user_msg,
             "Server misconfiguration: set GOOGLE_API_KEY (or GEMINI_API_KEY) for Gemini.",
         )
-        return _chatbot_panel_update(history), ""
+        return _chatbot_panel_update(history), "", history
 
     key = _rate_limit_key(request)
     ok, err = _limiter.check(key)
     if not ok:
         _append_turn(history, user_msg, err)
-        return _chatbot_panel_update(history), ""
+        return _chatbot_panel_update(history), "", history
 
     client = _get_client()
     try:
@@ -324,9 +329,13 @@ def chat_response(
         )
         if not allowed:
             _append_turn(history, user_msg, refusal)
-            return _chatbot_panel_update(history), ""
+            return _chatbot_panel_update(history), "", history
 
-        prior = _history_to_contents(history)
+        # Trim to the most recent exchanges so very long conversations don't
+        # exceed Gemini's context window.  The full history is still stored
+        # client-side (BrowserState) and displayed in the chatbot panel.
+        trimmed = history[-(2 * _MAX_HISTORY_EXCHANGES):]
+        prior = _history_to_contents(trimmed)
         prior.append(
             types.Content(
                 role="user",
@@ -349,7 +358,7 @@ def chat_response(
     except Exception as e:  # noqa: BLE001 — surface useful errors in the chat UI
         _append_turn(history, user_msg, f"Something went wrong: {e!s}")
 
-    return _chatbot_panel_update(history), ""
+    return _chatbot_panel_update(history), "", history
 
 
 def _build_demo() -> gr.Blocks:
@@ -365,6 +374,7 @@ def _build_demo() -> gr.Blocks:
         )
 
     with gr.Blocks(title="Portfolio chat") as demo:
+        persistent_history = gr.BrowserState([])
         gr.Markdown(intro, elem_id="portfolio-chat-intro")
         chatbot = gr.Chatbot(
             height=420,
@@ -386,11 +396,18 @@ def _build_demo() -> gr.Blocks:
             submit = gr.Button("Send", variant="primary")
             clear = gr.Button("Clear chat")
 
-        msg.submit(chat_response, [msg, chatbot], [chatbot, msg])
-        submit.click(chat_response, [msg, chatbot], [chatbot, msg])
+        # Restore saved history from localStorage when the page loads
+        demo.load(
+            lambda h: gr.update(value=h, visible=bool(h)),
+            inputs=[persistent_history],
+            outputs=[chatbot],
+        )
+
+        msg.submit(chat_response, [msg, chatbot], [chatbot, msg, persistent_history])
+        submit.click(chat_response, [msg, chatbot], [chatbot, msg, persistent_history])
         clear.click(
-            lambda: (gr.update(value=[], visible=False), ""),
-            outputs=[chatbot, msg],
+            lambda: (gr.update(value=[], visible=False), "", []),
+            outputs=[chatbot, msg, persistent_history],
         )
 
     return demo
