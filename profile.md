@@ -44,16 +44,6 @@ I'm an AI-native engineer with hands-on experience building applications using a
 
 ## Projects
 
-### Portfolio profile chatbot
-
-**Year:** 2025
-**Domain:** AI
-
-A Gradio chat UI on FastAPI that answers in my voice using Google Gemini, grounded in my profile PDF. A scope gate keeps questions on-topic before the main model runs; rate limits help control API cost. Packaged with Docker and embeddable on Hugging Face Spaces.
-
-**Tags:** Python, FastAPI, Gradio, Gemini, Docker
-**Repo:** https://github.com/srinivasrk/Chatbot
-
 ### Stock analyst — CrewAI
 
 **Year:** 2025
@@ -64,6 +54,26 @@ Agentic sector research with CrewAI: a multi-agent pipeline uses web search (Ser
 **Tags:** CrewAI, FastAPI, TypeScript, Gemini, Auth0
 **Demo:** https://stocks.srini.fyi
 **Repo:** https://github.com/srinivasrk/Market-Researcher---Crew-AI
+
+### Portfolio profile chatbot
+
+**Year:** 2025
+**Domain:** AI
+
+A Gradio chat UI on FastAPI that answers in my voice using Google Gemini, grounded in my profile PDF. A scope gate keeps questions on-topic before the main model runs; rate limits help control API cost. Packaged with Docker and embeddable on Hugging Face Spaces.
+
+**Tags:** Python, FastAPI, Gradio, Gemini, Docker
+**Repo:** https://github.com/srinivasrk/Chatbot
+
+### Agentic AI design patterns — LangGraph & OpenAI SDK
+
+**Year:** 2025
+**Domain:** AI
+
+A hands-on pattern library for multi-agent systems built with LangGraph and the OpenAI SDK. Covers evaluator-optimizer loops (cross-benchmarking Gemini and Ollama), structured tool-calling, and a three-agent moderated debate graph where two adversarial agents argue a position while a moderator orchestrates turn-taking, enforces rebuttal fairness, and drives the graph to a typed verdict via Pydantic-validated state. Patterns use LangGraph's Command routing, annotated reducers, and structured outputs to show how real agentic workflows are wired together.
+
+**Tags:** LangGraph, OpenAI SDK, Python, Gemini, Pydantic
+**Repo:** https://github.com/srinivasrk/AgenticAIWorkflows
 
 ### Seattle traffic map — PostGIS & Mapbox
 
