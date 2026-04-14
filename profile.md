@@ -37,7 +37,7 @@ I'm an AI-native engineer with hands-on experience building applications using a
 
 **Languages & scripting:** JavaScript, TypeScript, Java, Python, SQL, Linux / Bash
 **Frameworks & UI:** React, Next.js, Node.js, Svelte, Tailwind CSS, HTML5, CSS / SCSS
-**AI & agents:** OpenAI SDK, CrewAI
+**AI & agents:** OpenAI SDK, CrewAI, LangGraph, LangChain, AutoGen
 **Cloud & DevOps:** AWS, Docker, Kubernetes, Terraform, CI/CD
 **Databases & data stores:** DynamoDB, MongoDB, InfluxDB, RDS
 **Testing & tooling:** Jest, Git
