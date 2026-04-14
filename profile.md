@@ -7,7 +7,7 @@
 **GitHub:** https://github.com/srinivasrk
 **LinkedIn:** https://www.linkedin.com/in/srini-cincy
 
-I'm an AI-native engineer with hands-on experience building applications using agentic frameworks (OpenAI SDK, CrewAI, LangGraph, AutoGen, and similar). I build robust, end‑to‑end systems that bridge software architecture and cloud-scale infrastructure.
+I’m an AI-native engineer with hands-on experience building production-grade applications using agentic frameworks such as OpenAI SDK, CrewAI, LangGraph, and AutoGen. I create robust, end-to-end systems that unify software architecture with cloud-scale infrastructure, with practical expertise in AWS and Kubernetes.
 
 ## Highlights
 
