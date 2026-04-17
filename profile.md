@@ -89,6 +89,7 @@ Animated road congestion on a Mapbox map: centerlines and a full time series per
 
 ### 2026
 
+- *The Heaven & Earth Grocery Store* by James McBride
 - *American Moonshot: John F. Kennedy and the Great Space Race* by Douglas Brinkley
 - *Remarkably Bright Creatures* by Shelby Van Pelt
 - *Zen and the Art of Motorcycle Maintenance: An Inquiry Into Values* by Robert M. Pirsig
