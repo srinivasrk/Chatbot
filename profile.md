@@ -35,14 +35,23 @@ I’m an AI-native engineer with hands-on experience building production-grade a
 
 ## Skills
 
-**Languages & scripting:** JavaScript, TypeScript, Java, Python, SQL, Linux / Bash
-**Frameworks & UI:** React, Next.js, Node.js, Svelte, Tailwind CSS, HTML5, CSS / SCSS
+**Languages & scripting:** JavaScript, TypeScript, Java, Kotlin, Python, SQL, Linux / Bash
+**Frameworks & UI:** React, Next.js, Node.js, Svelte, Android, Tailwind CSS, HTML5, CSS / SCSS
 **AI & agents:** OpenAI SDK, CrewAI, LangGraph, LangChain, AutoGen
 **Cloud & DevOps:** AWS, Docker, Kubernetes, Terraform, CI/CD
 **Databases & data stores:** DynamoDB, MongoDB, InfluxDB, RDS
 **Testing & tooling:** Jest, Git
 
 ## Projects
+
+### Where's That Photo
+
+**Year:** 2026
+
+A native Android app for private, offline photo search using natural language. It combines on-device MobileCLIP, MiniLM, and Gemma to index images, generate metadata-aware captions, and deliver synonym-aware semantic retrieval without sending photos to the cloud.
+
+**Tags:** AI, Android, Kotlin, Jetpack Compose, ONNX
+**Repo:** https://github.com/srinivasrk/wheres-that-photo
 
 ### Stock analyst — CrewAI
 
