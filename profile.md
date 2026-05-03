@@ -53,6 +53,16 @@ A native Android app for private, offline photo search using natural language. I
 **Tags:** AI, Android, Kotlin, Jetpack Compose, ONNX
 **Repo:** https://github.com/srinivasrk/wheres-that-photo
 
+### LlamaIndex + LangGraph + Graphiti RAG PoC
+
+**Year:** 2026
+**Domain:** AI
+
+A local proof of concept for time-aware hybrid RAG: FastAPI runs LlamaIndex and LangGraph with parallel vector chunk retrieval (Chroma + Gemini embeddings) and Graphiti fact search on Neo4j, so answers ground on both passages and temporal graph facts (including superseded edges via valid_at / invalid_at). Next.js frontend adds document upload, chat with citations, and a live Cytoscape graph fed by snapshot and SSE endpoints.
+
+**Tags:** LlamaIndex, LangGraph, Neo4j, Chroma, Next.js, FastAPI, Gemini
+**Repo:** https://github.com/srinivasrk/llama-index-poc
+
 ### Stock analyst — CrewAI
 
 **Year:** 2025
