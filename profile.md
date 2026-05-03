@@ -53,6 +53,16 @@ A native Android app for private, offline photo search using natural language. I
 **Tags:** AI, Android, Kotlin, Jetpack Compose, ONNX
 **Repo:** https://github.com/srinivasrk/wheres-that-photo
 
+### DeepTutor
+
+**Year:** 2025–2026
+**Domain:** AI
+
+Among the top contributors to this HKUDS open-source project: an agent-native personalized learning assistant (Apache-2.0). It combines a FastAPI backend and Next.js app with RAG knowledge bases, multi-mode chat (research, deep solve, quizzes, visualization), Book Engine, persistent memory, TutorBots, and an agent-native CLI—tools and capabilities as a plugin model with LlamaIndex-backed RAG and document indexing.
+
+**Tags:** Python, Next.js, FastAPI, RAG, LlamaIndex, Multi-agent
+**Repo:** https://github.com/HKUDS/DeepTutor
+
 ### LlamaIndex + LangGraph + Graphiti RAG PoC
 
 **Year:** 2026
