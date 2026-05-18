@@ -118,6 +118,8 @@ Animated road congestion on a Mapbox map: centerlines and a full time series per
 
 ### 2026
 
+- *Packing for Mars: The Curious Science of Life in the Void* by Mary Roach
+- *The Housemaid* by Freida McFadden
 - *The Heaven & Earth Grocery Store* by James McBride
 - *American Moonshot: John F. Kennedy and the Great Space Race* by Douglas Brinkley
 - *Remarkably Bright Creatures* by Shelby Van Pelt
